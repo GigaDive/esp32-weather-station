@@ -1,2 +1,0 @@
-void setupWiFiManager();
-void loopWiFiManager();
