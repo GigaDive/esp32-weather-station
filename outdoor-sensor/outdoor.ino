@@ -160,8 +160,7 @@ void setModemSleep()
 {
     disableWiFi();
     //setCpuFrequencyMhz(40);
-    // Use this if 40Mhz is not supported
-    // setCpuFrequencyMhz(80);
+    // enabling this scrambles the debug console, use later in production
 }
 
 int enableWiFi()
@@ -210,9 +209,6 @@ int wakeModemSleep()
 int readBMEValues()
 {
     bool status;
-
-    // default settings
-    // (you can also pass in a Wire library object like &Wire2)
     status = bme.begin(0x76);
     if (!status)
     {
@@ -230,7 +226,7 @@ int readBMEValues()
                     Adafruit_BME280::SAMPLING_X2, // humidity
                     Adafruit_BME280::FILTER_OFF);
 
-    bme.takeForcedMeasurement(); // has no effect in normal mode
+    bme.takeForcedMeasurement();
 
     //dtostrf(value(float), mininum width, precision, target
     dtostrf(bme.readTemperature(), 4, 2, BME_TEMPERATURE);
@@ -265,9 +261,9 @@ void hibernate()
 void setup()
 {
     Serial.begin(115200); // Defining the channel on which logging is done
-    int error;            // All relevant functions can return an error-code which is saved in this funky fella
+    int error;            // All relevant functions may return an error-code which is saved here
 
-    //Increment boot number and print it every reboot DEBUG
+    // Say hello
     Serial.println("Hello! I'm awake again (つ ◕_◕ )つ");
     delay(100);
 
@@ -301,4 +297,5 @@ void setup()
 
 void loop()
 {
+    // Never reached, as we only run all function once before entering hibernation again
 }
