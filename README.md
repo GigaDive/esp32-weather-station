@@ -12,7 +12,7 @@ The current sequence goes as follows:
 4. Upload all the data to their relevant MQTT-channels
 5. Enter Hibernation again for a set amount of time
 
-For more information on hibernation, see [this blog post] (https://www.mischianti.org/2021/03/15/esp32-practical-power-saving-deep-sleep-and-hibernation-3/#Hibernation)
+For more information on hibernation, see [this blog post.](https://www.mischianti.org/2021/03/15/esp32-practical-power-saving-deep-sleep-and-hibernation-3/#Hibernation)  
 In the future, we might switch to ESP-Now for the transmission, but we need some conclusive power consumption measurements first.
 
 ## Inside Station
