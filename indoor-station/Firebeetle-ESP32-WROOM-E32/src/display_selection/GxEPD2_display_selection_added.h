@@ -77,6 +77,7 @@
 // HRDY -> 7, RST -> 9, CS -> SS(77), SCK -> SCK(76), MOSI -> MOSI(75), MISO -> MISO(74), GND -> GND, 5V -> 5V
 // note: 5V supply needs to be exact and strong; 5V over diode from USB (e.g. Wemos D1 mini) doesn't work!
 //GxEPD2_BW<GxEPD2_it60, MAX_HEIGHT(GxEPD2_it60)> display(GxEPD2_it60(/*CS=10*/ SS, /*DC=*/ 8, /*RST=*/ 9, /*BUSY=*/ 7));
+//GxEPD2_BW<GxEPD2_it60_1200x825, MAX_HEIGHT(GxEPD2_it60_1200x825)> display(GxEPD2_it60_1200x825(/*CS=10*/ SS, /*DC=*/ 8, /*RST=*/ 9, /*BUSY=*/ 7));
 //GxEPD2_BW<GxEPD2_it60_1448x1072, MAX_HEIGHT(GxEPD2_it60_1448x1072)> display(GxEPD2_it60_1448x1072(/*CS=10*/ SS, /*DC=*/ 8, /*RST=*/ 9, /*BUSY=*/ 7));
 //GxEPD2_BW<GxEPD2_it78_1872x1404, MAX_HEIGHT(GxEPD2_it78_1872x1404)> display(GxEPD2_it78_1872x1404(/*CS=10*/ SS, /*DC=*/ 8, /*RST=*/ 9, /*BUSY=*/ 7));
 #undef MAX_DISPLAY_BUFFER_SIZE
@@ -150,6 +151,7 @@
 // HRDY -> 5, RST -> 6, CS -> 4, SCK -> SCK(9), MOSI -> MOSI(8), MISO -> MISO(10), GND -> GND, 5V -> 5V
 // note: 5V supply needs to be exact and strong; 5V over diode from USB (e.g. Wemos D1 mini) doesn't work!
 //GxEPD2_BW<GxEPD2_it60, MAX_HEIGHT(GxEPD2_it60)> display(GxEPD2_it60(/*CS=*/ 4, /*DC=*/ 7, /*RST=*/ 6, /*BUSY=*/ 5));
+//GxEPD2_BW<GxEPD2_it60_1200x825, MAX_HEIGHT(GxEPD2_it60_1200x825)> display(GxEPD2_it60_1200x825(/*CS=10*/ SS, /*DC=*/ 8, /*RST=*/ 9, /*BUSY=*/ 7));
 //GxEPD2_BW<GxEPD2_it60_1448x1072, MAX_HEIGHT(GxEPD2_it60_1448x1072)> display(GxEPD2_it60_1448x1072(/*CS=*/ 4, /*DC=*/ 7, /*RST=*/ 6, /*BUSY=*/ 5));
 //GxEPD2_BW<GxEPD2_it78_1872x1404, MAX_HEIGHT(GxEPD2_it78_1872x1404)> display(GxEPD2_it78_1872x1404(/*CS=*/ 4, /*DC=*/ 7, /*RST=*/ 6, /*BUSY=*/ 5));
 #undef MAX_DISPLAY_BUFFER_SIZE
@@ -217,6 +219,7 @@
 // HRDY -> 4, RST -> 16, CS -> 5, SCK -> SCK(18), MOSI -> MOSI(23), MISO -> MISO(19), GND -> GND, 5V -> 5V
 // note: 5V supply needs to be exact and strong; 5V over diode from USB (e.g. Wemos D1 mini) doesn't work!
 //GxEPD2_BW<GxEPD2_it60, GxEPD2_it60::HEIGHT> display(GxEPD2_it60(/*CS=5*/ 5, /*DC=*/ 0, /*RST=*/ 2, /*BUSY=*/ 15));
+//GxEPD2_BW<GxEPD2_it60_1200x825, MAX_HEIGHT(GxEPD2_it60_1200x825)> display(GxEPD2_it60_1200x825(/*CS=10*/ SS, /*DC=*/ 8, /*RST=*/ 9, /*BUSY=*/ 7));
 //GxEPD2_BW < GxEPD2_it60_1448x1072, GxEPD2_it60_1448x1072::HEIGHT / 4 > display(GxEPD2_it60_1448x1072(/*CS=5*/ 5, /*DC=*/ 0, /*RST=*/ 2, /*BUSY=*/ 15));
 //GxEPD2_BW < GxEPD2_it78_1872x1404, GxEPD2_it78_1872x1404::HEIGHT / 8 > display(GxEPD2_it78_1872x1404(/*CS=5*/ 5, /*DC=*/ 0, /*RST=*/ 2, /*BUSY=*/ 15));
 #endif
@@ -280,6 +283,7 @@
 // HRDY -> 4, RST -> 16, CS -> SS(5), SCK -> SCK(18), MOSI -> MOSI(23), MISO -> MISO(19), GND -> GND, 5V -> 5V
 // note: 5V supply needs to be exact and strong; 5V over diode from USB (e.g. Wemos D1 mini) doesn't work!
 //GxEPD2_BW<GxEPD2_it60, GxEPD2_it60::HEIGHT> display(GxEPD2_it60(/*CS=5*/ 5, /*DC=*/ 2, /*RST=*/ 0, /*BUSY=*/ 4));
+//GxEPD2_BW<GxEPD2_it60_1200x825, MAX_HEIGHT(GxEPD2_it60_1200x825)> display(GxEPD2_it60_1200x825(/*CS=10*/ SS, /*DC=*/ 8, /*RST=*/ 9, /*BUSY=*/ 7));
 //GxEPD2_BW < GxEPD2_it60_1448x1072, GxEPD2_it60_1448x1072::HEIGHT / 4 > display(GxEPD2_it60_1448x1072(/*CS=5*/ 5, /*DC=*/ 2, /*RST=*/ 0, /*BUSY=*/ 4));
 //GxEPD2_BW < GxEPD2_it78_1872x1404, GxEPD2_it78_1872x1404::HEIGHT / 8 > display(GxEPD2_it78_1872x1404(/*CS=5*/ 5, /*DC=*/ 2, /*RST=*/ 0, /*BUSY=*/ 4));
 #endif

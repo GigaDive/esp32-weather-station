@@ -14,7 +14,7 @@
 // Good Display ePaper for Arduino: https://forum.arduino.cc/index.php?topic=436411.0
 
 // select the display class (only one), matching the kind of display panel
-//#define GxEPD2_DISPLAY_CLASS GxEPD2_BW
+#define GxEPD2_DISPLAY_CLASS GxEPD2_BW
 //#define GxEPD2_DISPLAY_CLASS GxEPD2_3C
 //#define GxEPD2_DISPLAY_CLASS GxEPD2_7C
 
@@ -72,7 +72,8 @@
 //#define GxEPD2_DRIVER_CLASS GxEPD2_565c // Waveshare 5.65" 7-color (3C graphics)
 // grey levels parallel IF e-papers on Waveshare e-Paper IT8951 Driver HAT
 //#define GxEPD2_DRIVER_CLASS GxEPD2_it60           // ED060SCT 800x600
-#define GxEPD2_DRIVER_CLASS GxEPD2_it60_1448x1072 // ED060KC1 1448x1072
+#define GxEPD2_DRIVER_CLASS GxEPD2_it60_1200x825 // ED060KC1 1448x1072
+//#define GxEPD2_DRIVER_CLASS GxEPD2_it60_1448x1072 // ED060KC1 1448x1072
 //#define GxEPD2_DRIVER_CLASS GxEPD2_it78_1872x1404 // ED078KC2 1872x1404
 
 // SS is usually used for CS. define here for easy change
@@ -128,7 +129,7 @@ GxEPD2_DISPLAY_CLASS<GxEPD2_DRIVER_CLASS, MAX_HEIGHT(GxEPD2_DRIVER_CLASS)> displ
 #if defined(ARDUINO_LOLIN_D32_PRO)
 GxEPD2_DISPLAY_CLASS<GxEPD2_DRIVER_CLASS, MAX_HEIGHT(GxEPD2_DRIVER_CLASS)> display(GxEPD2_DRIVER_CLASS(/*CS=5*/ EPD_CS, /*DC=*/0, /*RST=*/2, /*BUSY=*/15));
 #elif defined(ARDUINO_ESP32_DEV) // e.g. TTGO T8 ESP32-WROVER
-GxEPD2_DISPLAY_CLASS<GxEPD2_DRIVER_CLASS, MAX_HEIGHT(GxEPD2_DRIVER_CLASS)> display(GxEPD2_DRIVER_CLASS(/*CS=5*/ EPD_CS, /*DC=*/2, /*RST=*/0, /*BUSY=*/4));
+GxEPD2_DISPLAY_CLASS<GxEPD2_DRIVER_CLASS, MAX_HEIGHT(GxEPD2_DRIVER_CLASS)> display(GxEPD2_DRIVER_CLASS(/*CS=5*/ 12, /*DC=*/23, /*RST=*/16, /*BUSY=*/17));
 #else
 GxEPD2_DISPLAY_CLASS<GxEPD2_DRIVER_CLASS, MAX_HEIGHT(GxEPD2_DRIVER_CLASS)> display(GxEPD2_DRIVER_CLASS(/*CS=5*/ EPD_CS, /*DC=*/17, /*RST=*/16, /*BUSY=*/4));
 #endif
