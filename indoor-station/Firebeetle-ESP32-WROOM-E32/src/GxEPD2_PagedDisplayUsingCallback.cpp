@@ -26,6 +26,10 @@
 
 #include <GxEPD2_BW.h>
 #include <Fonts/FreeMonoBold9pt7b.h>
+#include "fonts/FiraMonoBold24pt7b.h"
+#include "fonts/FiraMonoBold36pt7b.h"
+#include "fonts/FiraMonoReg20pt7b.h"
+#include "fonts/FiraMonoReg48pt7b.h"
 
 // select the display class and display driver class in the following file (new style):
 #include "display_selection/GxEPD2_display_selection_new_style.h"
@@ -46,7 +50,7 @@ void helloWorld()
   uint16_t x = (display.width() - 160) / 2;
   uint16_t y = display.height() / 2;
   display.setRotation(0);
-  display.setFont(&FreeMonoBold9pt7b);
+  display.setFont(&FiraMono_Bold24pt7b);
   display.setTextColor(GxEPD_BLACK);
   display.setFullWindow();
   display.drawPaged(helloWorldCallback, 0);
@@ -307,9 +311,15 @@ void setup_paged()
   helloEpaper();
   delay(1000);
   Serial.println("showFont");
-  showFont("FreeMonoBold9pt7b", &FreeMonoBold9pt7b);
+  showFont("FiraMono_Bold24pt7b", &FiraMono_Bold24pt7b);
   delay(1000);
-  Serial.println("drawBitmaps");
+  showFont("FiraMono_Bold36pt7b", &FiraMono_Bold36pt7b);
+  delay(1000);
+  showFont("FiraMono_Reg20pt7b", &FiraMono_Regular20pt7b);
+  delay(1000);
+  showFont("FiraMono_Reg48pt7b", &FiraMono_Regular48pt7b);
+  delay(1000);
+
   if (display.epd2.hasPartialUpdate)
   {
     showPartialUpdate();
