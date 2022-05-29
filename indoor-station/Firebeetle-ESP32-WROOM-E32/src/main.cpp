@@ -10,7 +10,9 @@ using namespace std;
 
 #include <GxEPD2_BW.h>
 #include "fonts/FiraMonoBold14pt7b.h"
-#include "fonts/FiraMonoBold64pt7b.h"
+#include "fonts/FiraMonoBold48pt7b.h"
+#include "fonts/FiraMonoReg10pt7b.h"
+#include "fonts/FiraMonoReg24pt7b.h"
 
 #include "display_selection/GxEPD2_display_selection_new_style.h"
 
@@ -77,37 +79,62 @@ void drawGrid()
   display.drawPaged(drawGridCallback, 0);
 }
 
-void drawOutsideWeatherdataCallback(const void *parameters)
+void drawOutsideWeatherdataCallback(const void *)
 {
-  display.setCursor(20, 150);
-  display.fillScreen(GxEPD_WHITE);
-  display.print("Temperature: ");
-  display.printf("%.1f", getOutsideTemp());
-  display.setCursor(20, 200);
-  display.print("Humidity: ");
-  display.printf("%.0f", getOutsideHumid());
-  display.setCursor(20, 250);
-  display.print("Pressure: ");
-  display.printf("%.0f", getOutsidePress() / 100);
+
+  display.setFont(&FiraMono_Bold48pt7b);
+  display.setCursor(48, 191);
+
+  // Print temperature
+  // If the outside temp is in negative double digits, we omit the decimal place
+  if (getOutsideTemp() <= -10)
+  {
+    display.printf("%.0f", getOutsideTemp());
+  }
+  else
+  {
+    display.printf("%04.1f", getOutsideTemp());
+  }
+
+  // TODO: Print degree C symbol
+
+  // Print rel. Humidity
+  display.setCursor(52, 292);
+  display.setFont(&FiraMono_Regular24pt7b);
+  display.printf("%02.0f", getOutsideHumid());
+
+  display.setFont(&FiraMono_Regular10pt7b);
+  display.setCursor(120, 273);
+  display.print("%");
+  display.setCursor(114, 292);
+  display.print("rh");
+
+  // Print Pressure
+  display.setCursor(167, 292);
+  display.setFont(&FiraMono_Regular24pt7b);
+  display.printf("%04.0f", getOutsidePress() / 100);
+
+  display.setFont(&FiraMono_Regular10pt7b);
+  display.setCursor(283, 292);
+  display.print("hPa");
 }
 
 // callback function executed when data is received
 void drawOutsideWeatherdata()
 {
-  display.setFont(&FiraMono_Bold14pt7b);
   display.setPartialWindow(20, 100, 322, 272);
   display.drawPaged(drawOutsideWeatherdataCallback, 0);
 }
 
-void drawTimeAndDateCallback(const void *parameters)
+void drawTimeAndDateCallback(const void *)
 {
-  display.setCursor(414, 561);
+  display.setCursor(424, 555);
   display.fillScreen(GxEPD_WHITE);
   display.setFont(&FiraMono_Bold14pt7b);
   display.printf("%s, der %s.%s.%s", displayTime.weekday, displayTime.day, displayTime.month, displayTime.year);
 
-  display.setCursor(415, 676);
-  display.setFont(&FiraMono_Bold64pt7b);
+  display.setCursor(467, 651);
+  display.setFont(&FiraMono_Bold48pt7b);
   display.printf("%s", displayTime.time);
 }
 
@@ -174,7 +201,7 @@ void setup()
   drawGrid();
 
   // initIndoorSensor();
-  Serial.println("Indoor-Sensor Setup done \n");
+  // Serial.println("Indoor-Sensor Setup done \n");
 
   syncTimeWithServer();
   Serial.println("NTP Setup done \n");
