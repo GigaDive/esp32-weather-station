@@ -7,6 +7,7 @@ void loopIndoorSensor();
 float getIndoorTemp();
 float getIndoorPress();
 float getIndoorHumid();
-float getIndoorAQI();
+int getIndoorAQI();
+int getIndoorAQIAccuracy();
 
 #endif

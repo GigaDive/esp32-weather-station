@@ -99,8 +99,8 @@ void drawOutsideWeatherdataCallback(const void *)
   // TODO: Print degree C symbol
 
   // Print rel. Humidity
-  display.setCursor(52, 292);
   display.setFont(&FiraMono_Regular24pt7b);
+  display.setCursor(52, 292);
   display.printf("%02.0f", getOutsideHumid());
 
   display.setFont(&FiraMono_Regular10pt7b);
@@ -110,8 +110,8 @@ void drawOutsideWeatherdataCallback(const void *)
   display.print("rh");
 
   // Print Pressure
-  display.setCursor(167, 292);
   display.setFont(&FiraMono_Regular24pt7b);
+  display.setCursor(167, 292);
   display.printf("%04.0f", getOutsidePress() / 100);
 
   display.setFont(&FiraMono_Regular10pt7b);
@@ -124,6 +124,96 @@ void drawOutsideWeatherdata()
 {
   display.setPartialWindow(20, 100, 322, 272);
   display.drawPaged(drawOutsideWeatherdataCallback, 0);
+}
+
+void drawInsideWeatherdataCallback(const void *)
+{
+
+  display.setFont(&FiraMono_Bold48pt7b);
+  display.setCursor(878, 191);
+
+  // Print temperature
+  // Let's hope that the indoor temperature won't go into the negatives oAo; (hence no special formatting)
+  display.printf("%04.1f", getIndoorTemp());
+
+  // TODO: Print degree C symbol
+
+  // Print rel. Humidity
+  display.setFont(&FiraMono_Regular24pt7b);
+  display.setCursor(884, 292);
+  display.printf("%02.0f", getIndoorHumid());
+
+  display.setFont(&FiraMono_Regular10pt7b);
+  display.setCursor(947, 273);
+  display.print("%");
+  display.setCursor(941, 292);
+  display.print("rh");
+
+  // Print Pressure
+  display.setFont(&FiraMono_Regular24pt7b);
+  display.setCursor(994, 292);
+  display.printf("%04.0f", getIndoorPress() / 100);
+
+  display.setFont(&FiraMono_Regular10pt7b);
+  display.setCursor(1111, 292);
+  display.print("hPa");
+
+  // Print AQI (with accuracy on top)
+  const int AQI = getIndoorAQI(); // We need the value later for the smiley
+  display.setFont(&FiraMono_Regular24pt7b);
+  display.setCursor(916, 357);
+  display.printf("%03d", AQI);
+
+  display.setFont(&FiraMono_Regular10pt7b);
+  display.setCursor(1002, 336);
+  display.printf("(%d)", getIndoorAQIAccuracy());
+
+  display.setFont(&FiraMono_Regular10pt7b);
+  display.setCursor(1002, 357);
+  display.print("AQI");
+
+  // Print AQI-dependent smiley
+  display.setFont(&FiraMono_Regular24pt7b);
+  display.setCursor(1055, 357);
+
+  // If the sensor is still stabilizing (acurracy = 0) and we therefore do not have a valid output, we print :X (and speak no evil)
+  // See https://community.bosch-sensortec.com/t5/MEMS-sensors-forum/BME680-IAQ-accuracy-definition/td-p/5920
+  if (getIndoorAQIAccuracy() == 0)
+  {
+    display.print(":X");
+  }
+  // Else we can orient ourselves on the AQI ratings from the BME680 datasheet (Table 4 in V1.7)
+  else if (AQI < 50)
+  {
+    display.print(":D");
+  }
+  else if (AQI < 100)
+  {
+    display.print(":)");
+  }
+  else if (AQI < 150)
+  {
+    display.print(":/");
+  }
+  else if (AQI < 200)
+  {
+    display.print(":(");
+  }
+  else if (AQI < 250)
+  {
+    display.print(":C");
+  }
+  else
+  {
+    display.print("D:");
+  }
+}
+
+// callback function executed when data is received
+void drawInsideWeatherdata()
+{
+  display.setPartialWindow(850, 100, 322, 272);
+  display.drawPaged(drawInsideWeatherdataCallback, 0);
 }
 
 void drawTimeAndDateCallback(const void *)
@@ -200,16 +290,19 @@ void setup()
   display.setRotation(0);
   drawGrid();
 
+  initOutdoorSensor();
+  Serial.println("ESP-Now Setup done \n");
+
   // initIndoorSensor();
   // Serial.println("Indoor-Sensor Setup done \n");
 
   syncTimeWithServer();
   Serial.println("NTP Setup done \n");
 
-  initOutdoorSensor();
-  Serial.println("ESP-Now Setup done \n");
-
   Serial.println("Making first display update");
+  drawOutsideWeatherdata();
+
+  drawInsideWeatherdata();
   drawTimeAndDate();
 }
 
@@ -246,7 +339,22 @@ void loop()
     drawOutsideWeatherdata();
   }
 
+  // Update the indoor sensor values
+  if ((currentMillis - previousMillisInside) >= intervalInside)
+  {
+    Serial.println("Updating Inside Temp");
+    previousMillisInside = currentMillis;
+    drawInsideWeatherdata();
+  }
+
   // loopIndoorSensor();
 
   delay(500);
 }
+
+// DEBUGGERINO
+float getIndoorTemp() { return 22.2; }
+float getIndoorPress() { return 102576.80; }
+float getIndoorHumid() { return 67.55; }
+int getIndoorAQI() { return 251; }
+int getIndoorAQIAccuracy() { return 3; }
