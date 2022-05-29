@@ -35,3 +35,6 @@ github
 github.pub
 .vscode
 .idea
+cmake-build-debug
+CMakeLists.txt
+indoor-station/Firebeetle-ESP32-WROOM-E32/src/services/WiFiService.cpp

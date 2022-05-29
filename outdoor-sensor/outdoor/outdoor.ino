@@ -8,7 +8,7 @@
 Adafruit_BME280 bme; // Using the I2C-protocol, no further setup neccessary
 
 #define uS_TO_S_FACTOR 1000000 // Conversion factor for micro seconds to seconds
-#define TIME_TO_SLEEP 60       // Time ESP32 will go to sleep (in seconds)
+#define TIME_TO_SLEEP 30       // Time ESP32 will go to sleep (in seconds)
 
 // Set the SLAVE MAC Address (Reciever)
 uint8_t slaveAddress[] = {0x34, 0xAB, 0x95, 0x48, 0x92, 0x94};
@@ -168,7 +168,6 @@ void setup()
   int error;            // All relevant functions can return an error-code which is saved here
 
   Serial.println("Hello! I'm awake again (つ ◕_◕ )つ");
-  delay(100);
 
   // 1. Turn off wireless communication
   setModemSleep();
