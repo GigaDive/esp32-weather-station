@@ -2,7 +2,9 @@ using namespace std;
 
 #include <Arduino.h>
 
+#include "services/WiFiService.h"
 #include "OutdoorSensor.h"
+#include "Forecast.h"
 #include "IndoorSensor.h"
 #include "Timekeeping.h"
 
@@ -18,14 +20,15 @@ using namespace std;
 
 const int ONE_SECOND = 1000;
 
-unsigned long previousMillisTime = 0;
-const long intervalTime = ONE_SECOND * 60;
 
 unsigned long previousMillisOutside = 0;
 const long intervalOutside = (ONE_SECOND * 30); // DEBUG
 
 unsigned long previousMillisInside = 0;
 const long intervalInside = ONE_SECOND * 60;
+
+unsigned long previousMillisTime = 0;
+const long intervalTime = ONE_SECOND * 60;
 
 unsigned long previousMillisWiFi = 0;
 const long intervalWiFi = (ONE_SECOND * 60) * 60;
@@ -124,6 +127,54 @@ void drawOutsideWeatherdata()
 {
   display.setPartialWindow(20, 100, 322, 272);
   display.drawPaged(drawOutsideWeatherdataCallback, 0);
+}
+
+
+void drawForecastCallback(const void *)
+{
+
+  display.setFont(&FiraMono_Bold48pt7b);
+  display.setCursor(48, 191);
+
+  // Print temperature
+  // If the outside temp is in negative double digits, we omit the decimal place
+  if (getOutsideTemp() <= -10)
+  {
+    display.printf("%.0f", getOutsideTemp());
+  }
+  else
+  {
+    display.printf("%04.1f", getOutsideTemp());
+  }
+
+  // TODO: Print degree C symbol
+
+  // Print rel. Humidity
+  display.setFont(&FiraMono_Regular24pt7b);
+  display.setCursor(52, 292);
+  display.printf("%02.0f", getOutsideHumid());
+
+  display.setFont(&FiraMono_Regular10pt7b);
+  display.setCursor(120, 273);
+  display.print("%");
+  display.setCursor(114, 292);
+  display.print("rh");
+
+  // Print Pressure
+  display.setFont(&FiraMono_Regular24pt7b);
+  display.setCursor(167, 292);
+  display.printf("%04.0f", getOutsidePress() / 100);
+
+  display.setFont(&FiraMono_Regular10pt7b);
+  display.setCursor(283, 292);
+  display.print("hPa");
+}
+
+// callback function executed when data is received
+void drawForecast()
+{
+  display.setPartialWindow(20, 100, 322, 272);
+  display.drawPaged(drawForecastCallback, 0);
 }
 
 void drawInsideWeatherdataCallback(const void *)
@@ -290,14 +341,19 @@ void setup()
   display.setRotation(0);
   drawGrid();
 
+  connectWiFi();
+  syncTimeWithServer();
+  Serial.println("NTP Setup done \n");
+
+  syncDWDForecast();
+  Serial.println("NTP Setup done \n");
+
+  disconnectWiFi();
   initOutdoorSensor();
   Serial.println("ESP-Now Setup done \n");
 
   // initIndoorSensor();
   // Serial.println("Indoor-Sensor Setup done \n");
-
-  syncTimeWithServer();
-  Serial.println("NTP Setup done \n");
 
   Serial.println("Making first display update");
   drawOutsideWeatherdata();
@@ -356,5 +412,5 @@ void loop()
 float getIndoorTemp() { return 22.2; }
 float getIndoorPress() { return 102576.80; }
 float getIndoorHumid() { return 67.55; }
-int getIndoorAQI() { return 251; }
+int getIndoorAQI() { return 25; }
 int getIndoorAQIAccuracy() { return 3; }

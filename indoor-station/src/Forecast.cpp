@@ -4,24 +4,19 @@ using namespace std;
 #include "Timekeeping.h"
 
 #include <Arduino.h>
-
-#include <iostream>
-#include <string>
-#include <cstdlib>
-#include "services/WiFiService.h"
+#include <WiFi.h>
 
 const char *ntpServer = "pool.ntp.org";
 const long gmtOffset_sec = 3600;
 const int daylightOffset_sec = 3600;
 
-
-
-
 void syncTimeWithServer()
 {
-  // NTP Time-Server
-  connectWiFi();
 
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("Time-syncing depends on a WiFi connection!");
+    return;
+  }
   // Init and get the time
   Serial.print("Polling NTP-Server");
 
@@ -32,5 +27,4 @@ void syncTimeWithServer()
     configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
   }
   Serial.println();
-  disconnectWiFi();
 }
