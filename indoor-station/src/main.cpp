@@ -290,7 +290,7 @@ void drawTimeAndDate()
   strcpy(displayTime.weekday, intToGermanWeekday(weekdayInt[0]));
 
   // Lower Half of the Display
-  display.setPartialWindow(15, (display.height() / 2) + 5, display.width() - 40, (display.height() / 2) - 20);
+  display.setPartialWindow(24, (display.height() / 2) + 5, display.width() - 80, (display.height() / 2) - 20);
   display.drawPaged(drawTimeAndDateCallback, 0);
 }
 
