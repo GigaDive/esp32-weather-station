@@ -3,6 +3,7 @@ using namespace std;
 #include <Arduino.h>
 
 #include "services/WiFiService.h"
+#include "services/WeekdayConverter.h"
 #include "OutdoorSensor.h"
 #include "Forecast.h"
 #include "IndoorSensor.h"
@@ -20,12 +21,11 @@ using namespace std;
 
 const int ONE_SECOND = 1000;
 
-
 unsigned long previousMillisOutside = 0;
 const long intervalOutside = (ONE_SECOND * 30); // DEBUG
 
 unsigned long previousMillisInside = 0;
-const long intervalInside = ONE_SECOND * 60;
+const long intervalInside = ONE_SECOND * 15;
 
 unsigned long previousMillisTime = 0;
 const long intervalTime = ONE_SECOND * 60;
@@ -129,51 +129,42 @@ void drawOutsideWeatherdata()
   display.drawPaged(drawOutsideWeatherdataCallback, 0);
 }
 
-
 void drawForecastCallback(const void *)
 {
 
-  display.setFont(&FiraMono_Bold48pt7b);
-  display.setCursor(48, 191);
-
-  // Print temperature
-  // If the outside temp is in negative double digits, we omit the decimal place
-  if (getOutsideTemp() <= -10)
+  // Print todays temperatures
+  // If the forecast avg temp is in negative double digits, we omit the decimal place
+  display.setFont(&FiraMono_Regular24pt7b);
+  display.setCursor(534, 155);
+  if (getForecastTodayAvgTemp() <= -10)
   {
-    display.printf("%.0f", getOutsideTemp());
+    display.printf("%.0f", getForecastTodayAvgTemp());
   }
   else
   {
-    display.printf("%04.1f", getOutsideTemp());
+    display.printf("%04.1f", getForecastTodayAvgTemp());
   }
 
-  // TODO: Print degree C symbol
-
-  // Print rel. Humidity
-  display.setFont(&FiraMono_Regular24pt7b);
-  display.setCursor(52, 292);
-  display.printf("%02.0f", getOutsideHumid());
-
+  // Today max
   display.setFont(&FiraMono_Regular10pt7b);
-  display.setCursor(120, 273);
-  display.print("%");
-  display.setCursor(114, 292);
-  display.print("rh");
+  display.setCursor(534, 201);
+  if (getForecastTodayMaxTemp() <= -10)
+  {
+    display.printf("%.0f", getForecastTodayMaxTemp());
+  }
+  else
+  {
+    display.printf("%04.1f", getForecastTodayMaxTemp());
+  }
 
-  // Print Pressure
-  display.setFont(&FiraMono_Regular24pt7b);
-  display.setCursor(167, 292);
-  display.printf("%04.0f", getOutsidePress() / 100);
-
-  display.setFont(&FiraMono_Regular10pt7b);
-  display.setCursor(283, 292);
-  display.print("hPa");
+  // Spacing dot
+  display.fillCircle(600, 195, 6, GxEPD_BLACK);
 }
 
 // callback function executed when data is received
 void drawForecast()
 {
-  display.setPartialWindow(20, 100, 322, 272);
+  display.setPartialWindow(376, 72, 456, 323);
   display.drawPaged(drawForecastCallback, 0);
 }
 
@@ -296,34 +287,7 @@ void drawTimeAndDate()
   char weekdayInt[2];
   strftime(weekdayInt, 2, "%w", &timeinfo);
 
-  switch (weekdayInt[0])
-  {
-  case '0':
-    strcpy(displayTime.weekday, "Sonntag");
-    break;
-  case '1':
-    strcpy(displayTime.weekday, "Montag");
-    break;
-  case '2':
-    strcpy(displayTime.weekday, "Dienstag");
-    break;
-  case '3':
-    strcpy(displayTime.weekday, "Mittwoch");
-    break;
-  case '4':
-    strcpy(displayTime.weekday, "Donnerstag");
-    break;
-  case '5':
-    strcpy(displayTime.weekday, "Freitag");
-    break;
-  case '6':
-    strcpy(displayTime.weekday, "Samstag");
-    break;
-
-  default:
-    strcpy(displayTime.weekday, "Fehler");
-    break;
-  }
+  strcpy(displayTime.weekday, intToGermanWeekday(weekdayInt[0]));
 
   // Lower Half of the Display
   display.setPartialWindow(15, (display.height() / 2) + 5, display.width() - 40, (display.height() / 2) - 20);
@@ -347,8 +311,8 @@ void setup()
 
   syncDWDForecast();
   Serial.println("NTP Setup done \n");
-
   disconnectWiFi();
+
   initOutdoorSensor();
   Serial.println("ESP-Now Setup done \n");
 
