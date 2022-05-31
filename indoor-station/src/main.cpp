@@ -122,7 +122,6 @@ void drawOutsideWeatherdataCallback(const void *)
   display.print("hPa");
 }
 
-// callback function executed when data is received
 void drawOutsideWeatherdata()
 {
   display.setPartialWindow(20, 100, 322, 272);
@@ -161,7 +160,6 @@ void drawForecastCallback(const void *)
   display.fillCircle(600, 195, 6, GxEPD_BLACK);
 }
 
-// callback function executed when data is received
 void drawForecast()
 {
   display.setPartialWindow(376, 72, 456, 323);
@@ -251,7 +249,6 @@ void drawInsideWeatherdataCallback(const void *)
   }
 }
 
-// callback function executed when data is received
 void drawInsideWeatherdata()
 {
   display.setPartialWindow(850, 100, 322, 272);
