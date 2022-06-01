@@ -3,7 +3,7 @@
 
 void syncDWDForecast();
 
-float getForecastTodayIcon();
+char getForecastTodayIcon();
 float getForecastTodayAvgTemp();
 float getForecastTodayMaxTemp();
 float getForecastTodayMinTemp();
@@ -12,13 +12,13 @@ float getForecastTodayWindSpeed();
 float getForecastTodaySunHrs();
 float getForecastTodayOvercastPercent();
 
-float getForecastTomorrowIcon();
+char getForecastTomorrowIcon();
 float getForecastTomorrowAvgTemp();
 
-float getForecastOvermomorrowIcon();
+char getForecastOvermomorrowIcon();
 float getForecastOvermomorrowAvgTemp();
 
-float getForecastOverOvermomorrowIcon();
+char getForecastOverOvermomorrowIcon();
 float getForecastOverOvermomorrowAvgTemp();
 
 

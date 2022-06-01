@@ -4,6 +4,7 @@ using namespace std;
 
 #include "services/WiFiService.h"
 #include "services/WeekdayConverter.h"
+#include "services/IconMapper.h"
 #include "OutdoorSensor.h"
 #include "Forecast.h"
 #include "IndoorSensor.h"
@@ -16,6 +17,11 @@ using namespace std;
 #include "fonts/FiraMonoBold48pt7b.h"
 #include "fonts/FiraMonoReg10pt7b.h"
 #include "fonts/FiraMonoReg24pt7b.h"
+
+#include "fonts/Meteocons48pt7b.h"
+#include "fonts/Meteocons72pt7b.h"
+
+#include "fonts/Meteocons20pt7b.h"
 
 #include "display_selection/GxEPD2_display_selection_new_style.h"
 
@@ -75,9 +81,21 @@ void drawGridCallback(const void *)
   display.print("Ich fahre gerade hoch, einen Moment noch (X-X)");
 }
 
+void refreshCallbackBLK(const void *)
+{
+  display.fillScreen(GxEPD_BLACK);
+}
+
+void refreshCallbackWT(const void *)
+{
+  display.fillScreen(GxEPD_WHITE);
+}
+
 void drawGrid()
 {
   display.setFullWindow();
+  display.drawPaged(refreshCallbackWT, 0);
+  // display.drawPaged(refreshCallbackBLK, 0);
   display.setFont(&FiraMono_Bold14pt7b);
   display.drawPaged(drawGridCallback, 0);
 }
@@ -99,7 +117,10 @@ void drawOutsideWeatherdataCallback(const void *)
     display.printf("%04.1f", getOutsideTemp());
   }
 
-  // TODO: Print degree C symbol
+  // Print degree C symbol
+  display.setFont(&meteocons48pt7b);
+  display.setCursor(251, 183);
+  display.print("*");
 
   // Print rel. Humidity
   display.setFont(&FiraMono_Regular24pt7b);
@@ -131,6 +152,11 @@ void drawOutsideWeatherdata()
 void drawForecastCallback(const void *)
 {
 
+  // Print todays icon
+  display.setFont(&meteocons72pt7b);
+  display.setCursor(388, 203);
+  display.print(getForecastTodayIcon());
+
   // Print todays temperatures
   // If the forecast avg temp is in negative double digits, we omit the decimal place
   display.setFont(&FiraMono_Regular24pt7b);
@@ -143,6 +169,9 @@ void drawForecastCallback(const void *)
   {
     display.printf("%04.1f", getForecastTodayAvgTemp());
   }
+  display.setFont(&meteocons20pt7b);
+  display.setCursor(638, 147);
+  display.print("*");
 
   // Today max
   display.setFont(&FiraMono_Regular10pt7b);
@@ -157,7 +186,31 @@ void drawForecastCallback(const void *)
   }
 
   // Spacing dot
-  display.fillCircle(600, 195, 6, GxEPD_BLACK);
+  display.fillCircle(600, 195, 3, GxEPD_BLACK);
+
+  // Today min
+  display.setFont(&FiraMono_Regular10pt7b);
+  display.setCursor(610, 201);
+  if (getForecastTodayMinTemp() <= -10)
+  {
+    display.printf("%.0f", getForecastTodayMinTemp());
+  }
+  else
+  {
+    display.printf("%04.1f", getForecastTodayMinTemp());
+  }
+
+  // Tomorrow Icon
+  display.setFont(&meteocons48pt7b);
+  display.setCursor(411, 364);
+  display.print(getForecastTomorrowIcon());
+  // Tomorrow Temp
+  display.setFont(&FiraMono_Regular10pt7b);
+  display.setCursor(429, 389);
+  display.printf("%.0f", getForecastTodayMinTemp());
+  display.setFont(&meteocons20pt7b);
+  display.setCursor(455, 399);
+  display.print("*");
 }
 
 void drawForecast()
@@ -176,7 +229,10 @@ void drawInsideWeatherdataCallback(const void *)
   // Let's hope that the indoor temperature won't go into the negatives oAo; (hence no special formatting)
   display.printf("%04.1f", getIndoorTemp());
 
-  // TODO: Print degree C symbol
+  // Print degree C symbol
+  display.setFont(&meteocons48pt7b);
+  display.setCursor(1081, 183);
+  display.print("*");
 
   // Print rel. Humidity
   display.setFont(&FiraMono_Regular24pt7b);
@@ -301,13 +357,14 @@ void setup()
   display.setTextColor(GxEPD_BLACK);
   display.setRotation(0);
   drawGrid();
+  drawForecast();
 
   connectWiFi();
   syncTimeWithServer();
   Serial.println("NTP Setup done \n");
 
   syncDWDForecast();
-  Serial.println("NTP Setup done \n");
+  Serial.println("DWD Setup done \n");
   disconnectWiFi();
 
   initOutdoorSensor();
@@ -375,3 +432,21 @@ float getIndoorPress() { return 102576.80; }
 float getIndoorHumid() { return 67.55; }
 int getIndoorAQI() { return 25; }
 int getIndoorAQIAccuracy() { return 3; }
+
+char getForecastTodayIcon() { return iconTypeToMeteocon("clear-day"); }
+float getForecastTodayAvgTemp() { return 20.1; }
+float getForecastTodayMaxTemp() { return 25.8; }
+float getForecastTodayMinTemp() { return 11.8; }
+float getForecastTodayRainAmt() { return 0.0; }
+float getForecastTodayWindSpeed() { return 4.7; }
+float getForecastTodaySunHrs() { return 12.33; }
+float getForecastTodayOvercastPercent() { return 56.6584; }
+
+char getForecastTomorrowIcon() { return iconTypeToMeteocon("clear-day"); }
+float getForecastTomorrowAvgTemp() { return 23.8; }
+
+char getForecastOvermomorrowIcon() { return iconTypeToMeteocon("clear-day"); }
+float getForecastOvermomorrowAvgTemp() { return 20.5; }
+
+char getForecastOverOvermomorrowIcon() { return iconTypeToMeteocon("clear-day"); }
+float getForecastOverOvermomorrowAvgTemp() { return -10.9; }
