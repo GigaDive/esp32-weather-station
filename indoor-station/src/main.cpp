@@ -22,6 +22,7 @@ using namespace std;
 #include "fonts/Meteocons72pt7b.h"
 
 #include "fonts/Meteocons20pt7b.h"
+#include "fonts/Meteocons12pt7b.h"
 
 #include "display_selection/GxEPD2_display_selection_new_style.h"
 
@@ -202,10 +203,46 @@ void drawForecastCallback(const void *)
     display.printf("%04.1f", getForecastTodayMinTemp());
   }
 
+  // Rain Amount
+  display.setFont(&meteocons12pt7b);
+  display.setCursor(693, 107);
+  display.print("8"); // Raincloud
+  display.setFont(&FiraMono_Regular10pt7b);
+  display.setCursor(723, 101);
+  display.printf("%3.1f mm/h", getForecastTodayRainAmt());
+
+  // Wind speed
+  display.setFont(&meteocons12pt7b);
+  display.setCursor(693, 141);
+  display.print("F"); // Wind
+  display.setFont(&FiraMono_Regular10pt7b);
+  display.setCursor(723, 135);
+  display.printf("%-2.0f bft", getForecastTodayWindSpeed());
+
+  // Sun-hours
+  display.setFont(&meteocons12pt7b);
+  display.setCursor(693, 175);
+  display.print("1"); // Sun
+  display.setFont(&FiraMono_Regular10pt7b);
+  display.setCursor(723, 170);
+  display.printf("%s h", getForecastTodaySunHrs());
+
+  // Overcast percentage
+  display.setFont(&meteocons12pt7b);
+  display.setCursor(693, 208);
+  display.print("5"); // Cloud
+  display.setFont(&FiraMono_Regular10pt7b);
+  display.setCursor(723, 203);
+  display.printf("%-3.0f %%", getForecastTodayOvercastPercent());
+
+  // For the date above the forecast, we need to know what day it is today
+  char weekdayInt[2];
+  strftime(weekdayInt, 2, "%w", &timeinfo);
+
   // Tomorrow day
   display.setFont(&FiraMono_Regular10pt7b);
   display.setCursor(416, 276);
-  display.printf("%.0f", getForecastTodayMinTemp());
+  display.printf("%s", intToGermanWeekday(weekdayInt[0] + 1));
   // Tomorrow Icon
   display.setFont(&meteocons48pt7b);
   display.setCursor(411, 364);
@@ -213,9 +250,41 @@ void drawForecastCallback(const void *)
   // Tomorrow Temp
   display.setFont(&FiraMono_Regular10pt7b);
   display.setCursor(429, 389);
-  display.printf("%.0f", getForecastTodayMinTemp());
+  display.printf("%.0f", getForecastTomorrowAvgTemp());
   display.setFont(&meteocons20pt7b);
   display.setCursor(455, 399);
+  display.print("*");
+
+  // Overmorrow day
+  display.setFont(&FiraMono_Regular10pt7b);
+  display.setCursor(555, 276);
+  display.printf("%s", intToGermanWeekday(weekdayInt[0] + 2));
+  // Overmorrow Icon
+  display.setFont(&meteocons48pt7b);
+  display.setCursor(553, 364);
+  display.print(getForecastOvermorrowIcon());
+  // Overmorrow Temp
+  display.setFont(&FiraMono_Regular10pt7b);
+  display.setCursor(571, 389);
+  display.printf("%.0f", getForecastOvermorrowAvgTemp());
+  display.setFont(&meteocons20pt7b);
+  display.setCursor(597, 399);
+  display.print("*");
+
+  // Overovermorrow day (the day after the day after tomorrow)
+  display.setFont(&FiraMono_Regular10pt7b);
+  display.setCursor(699, 276);
+  display.printf("%s", intToGermanWeekday(weekdayInt[0] + 3));
+  // Overovermorrow Icon
+  display.setFont(&meteocons48pt7b);
+  display.setCursor(694, 364);
+  display.print(getForecastOvermorrowIcon());
+  // Overovermorrow Temp
+  display.setFont(&FiraMono_Regular10pt7b);
+  display.setCursor(712, 389);
+  display.printf("%.0f", getForecastOvermorrowAvgTemp());
+  display.setFont(&meteocons20pt7b);
+  display.setCursor(738, 399);
   display.print("*");
 }
 
@@ -444,14 +513,14 @@ float getForecastTodayMaxTemp() { return 25.8; }
 float getForecastTodayMinTemp() { return 11.8; }
 float getForecastTodayRainAmt() { return 0.0; }
 float getForecastTodayWindSpeed() { return 4.7; }
-float getForecastTodaySunHrs() { return 12.33; }
+const char* getForecastTodaySunHrs() { return "12:33"; }
 float getForecastTodayOvercastPercent() { return 56.6584; }
 
 char getForecastTomorrowIcon() { return iconTypeToMeteocon("clear-day"); }
 float getForecastTomorrowAvgTemp() { return 23.8; }
 
-char getForecastOvermomorrowIcon() { return iconTypeToMeteocon("clear-day"); }
-float getForecastOvermomorrowAvgTemp() { return 20.5; }
+char getForecastOvermorrowIcon() { return iconTypeToMeteocon("clear-day"); }
+float getForecastOvermorrowAvgTemp() { return 20.5; }
 
-char getForecastOverOvermomorrowIcon() { return iconTypeToMeteocon("clear-day"); }
-float getForecastOverOvermomorrowAvgTemp() { return -10.9; }
+char getForecastOverOvermorrowIcon() { return iconTypeToMeteocon("clear-day"); }
+float getForecastOverOvermorrowAvgTemp() { return -10.9; }
