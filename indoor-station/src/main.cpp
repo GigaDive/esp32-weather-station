@@ -49,6 +49,8 @@ struct display_time
 };
 display_time displayTime;
 
+struct tm timeinfo;
+
 void drawGridCallback(const void *)
 {
   display.fillScreen(GxEPD_WHITE);
@@ -200,6 +202,10 @@ void drawForecastCallback(const void *)
     display.printf("%04.1f", getForecastTodayMinTemp());
   }
 
+  // Tomorrow day
+  display.setFont(&FiraMono_Regular10pt7b);
+  display.setCursor(416, 276);
+  display.printf("%.0f", getForecastTodayMinTemp());
   // Tomorrow Icon
   display.setFont(&meteocons48pt7b);
   display.setCursor(411, 364);
@@ -325,13 +331,6 @@ void drawTimeAndDateCallback(const void *)
 
 void drawTimeAndDate()
 {
-  struct tm timeinfo;
-  if (!getLocalTime(&timeinfo))
-  {
-    Serial.println("Failed to obtain time");
-    return;
-  }
-
   strftime(displayTime.day, 3, "%d", &timeinfo);
   strftime(displayTime.month, 3, "%m", &timeinfo);
   strftime(displayTime.year, 5, "%Y", &timeinfo);
@@ -361,6 +360,12 @@ void setup()
 
   connectWiFi();
   syncTimeWithServer();
+  // Make first update to time struct
+  if (!getLocalTime(&timeinfo))
+  {
+    Serial.println("Failed to obtain time");
+    return;
+  }
   Serial.println("NTP Setup done \n");
 
   syncDWDForecast();
@@ -389,14 +394,14 @@ void loop()
   if ((currentMillis - previousMillisTime) >= intervalTime)
   {
     previousMillisTime = currentMillis;
-    drawTimeAndDate();
 
-    struct tm timeinfo;
     if (!getLocalTime(&timeinfo))
     {
       Serial.println("Failed to obtain time");
       return;
     }
+
+    drawTimeAndDate();
 
     // Make it so that the next update ocurrs 3s after the full minute, so we don't accidentally display the old minute
     // Race condition remover - A+ programming
