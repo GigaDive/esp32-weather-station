@@ -27,4 +27,5 @@ void syncTimeWithServer()
     configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
   }
   Serial.println();
+  Serial.println("Successfully synced up time");
 }

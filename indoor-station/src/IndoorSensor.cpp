@@ -68,7 +68,7 @@ void initIndoorSensor(void)
   checkIaqSensorStatus();
 
   // Print the header
-  output = "Timestamp [ms], raw temperature [°C], pressure [hPa], raw relative humidity [%], gas [Ohm], IAQ, IAQ accuracy, temperature [°C], relative humidity [%]";
+  output = "Timestamp [ms], raw temperature [°C], temperature [°C], pressure [hPa], raw relative humidity [%], relative humidity [%], gas [Ohm], IAQ, IAQ accuracy, Static IAQ, CO2 equivalent, breath VOC equivalent";
   Serial.println(output);
 }
 
@@ -79,17 +79,17 @@ void loopIndoorSensor(void)
   if (iaqSensor.run())
   { // If new data is available
     output = String(time_trigger) + "\n";
-    output += "raw temperature [°C]: " + String(iaqSensor.rawTemperature) + "\n";
-    output += "temperature [°C]: " + String(iaqSensor.temperature) + "\n";
-    output += "pressure [hPa]: " + String(iaqSensor.pressure) + "\n";
-    output += "raw relative humidity [%]: " + String(iaqSensor.rawHumidity) + "\n";
-    output += "relative humidity [%]: " + String(iaqSensor.humidity) + "\n";
-    output += "gas [Ohm]: " + String(iaqSensor.gasResistance) + "\n";
-    output += "IAQ: " + String(iaqSensor.iaq) + "\n";
-    output += "IAQ accuracy: " + String(iaqSensor.iaqAccuracy) + "\n";
-    output += "Static IAQ: " + String(iaqSensor.staticIaq) + "\n";
-    output += "CO2 equivalent: " + String(iaqSensor.co2Equivalent) + "\n";
-    output += "breath VOC equivalent: " + String(iaqSensor.breathVocEquivalent) + "\n";
+    output += "raw temperature [°C]: " + String(iaqSensor.rawTemperature);
+    output += ", temperature [°C]: " + String(iaqSensor.temperature);
+    output += ", pressure [hPa]: " + String(iaqSensor.pressure);
+    output += ", raw relative humidity [%]: " + String(iaqSensor.rawHumidity);
+    output += ", relative humidity [%]: " + String(iaqSensor.humidity);
+    output += ", gas [Ohm]: " + String(iaqSensor.gasResistance);
+    output += ", IAQ: " + String(iaqSensor.iaq);
+    output += ", IAQ accuracy: " + String(iaqSensor.iaqAccuracy);
+    output += ", Static IAQ: " + String(iaqSensor.staticIaq);
+    output += ", CO2 equivalent: " + String(iaqSensor.co2Equivalent);
+    output += ", breath VOC equivalent: " + String(iaqSensor.breathVocEquivalent);
     Serial.println(output);
   }
   else
@@ -211,3 +211,10 @@ void updateState(void)
     EEPROM.commit();
   }
 }
+/*
+float getIndoorTemp() { return iaqSensor.temperature; }
+float getIndoorPress() { return iaqSensor.pressure; }
+float getIndoorHumid() { return iaqSensor.humidity; }
+int getIndoorAQI() { return iaqSensor.iaq; }
+int getIndoorAQIAccuracy() { return iaqSensor.iaqAccuracy; }
+*/

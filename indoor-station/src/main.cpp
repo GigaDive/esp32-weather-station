@@ -37,8 +37,8 @@ const long intervalInside = ONE_SECOND * 15;
 unsigned long previousMillisTime = 0;
 const long intervalTime = ONE_SECOND * 60;
 
-unsigned long previousMillisWiFi = 0;
-const long intervalWiFi = (ONE_SECOND * 60) * 60;
+unsigned long previousMillisForecast = 0;
+const long intervalForecast = (ONE_SECOND * 60) * 60;
 
 struct display_time
 {
@@ -229,7 +229,7 @@ void drawForecastCallback(const void *)
 
   // Overcast percentage
   display.setFont(&meteocons12pt7b);
-  display.setCursor(693, 208);
+  display.setCursor(692, 208);
   display.print("5"); // Cloud
   display.setFont(&FiraMono_Regular10pt7b);
   display.setCursor(723, 203);
@@ -425,7 +425,6 @@ void setup()
   display.setTextColor(GxEPD_BLACK);
   display.setRotation(0);
   drawGrid();
-  drawForecast();
 
   connectWiFi();
   syncTimeWithServer();
@@ -441,7 +440,7 @@ void setup()
   Serial.println("DWD Setup done \n");
   disconnectWiFi();
 
-  initOutdoorSensor();
+  initESPNow();
   Serial.println("ESP-Now Setup done \n");
 
   // initIndoorSensor();
@@ -449,7 +448,7 @@ void setup()
 
   Serial.println("Making first display update");
   drawOutsideWeatherdata();
-
+  drawForecast();
   drawInsideWeatherdata();
   drawTimeAndDate();
 }
@@ -487,6 +486,27 @@ void loop()
     drawOutsideWeatherdata();
   }
 
+  // Poll the DWD/Brightsky API as well as the NTP server and update the forecast values
+  if ((currentMillis - previousMillisForecast) >= intervalForecast)
+  {
+    Serial.println("Updating Forecast data");
+    previousMillisOutside = currentMillis;
+
+    // Disable ESPNow and enable WiFi
+    deinitESPNow();
+    connectWiFi();
+
+    // Sync up with the DWD and NTP servers
+    syncDWDForecast();
+    syncTimeWithServer();
+
+    // Disable WiFi and enable ESPNow again
+    disconnectWiFi();
+    initESPNow();
+
+    drawForecast();
+  }
+
   // Update the indoor sensor values
   if ((currentMillis - previousMillisInside) >= intervalInside)
   {
@@ -513,7 +533,7 @@ float getForecastTodayMaxTemp() { return 25.8; }
 float getForecastTodayMinTemp() { return 11.8; }
 float getForecastTodayRainAmt() { return 0.0; }
 float getForecastTodayWindSpeed() { return 4.7; }
-const char* getForecastTodaySunHrs() { return "12:33"; }
+const char *getForecastTodaySunHrs() { return "12:33"; }
 float getForecastTodayOvercastPercent() { return 56.6584; }
 
 char getForecastTomorrowIcon() { return iconTypeToMeteocon("clear-day"); }

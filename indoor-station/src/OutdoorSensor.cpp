@@ -43,9 +43,9 @@ void OnRecv(const uint8_t *mac, const uint8_t *incomingData, int len)
 
 }
 
-// Technically this initializes the ESPNow services and events, but this name is more logical in my opinion
-void initOutdoorSensor()
+void initESPNow()
 {
+  Serial.println("Initializing ESP Now");
   WiFi.mode(WIFI_STA);
   // Init ESP-NOW
   if (esp_now_init() != ESP_OK)
@@ -75,14 +75,18 @@ void initOutdoorSensor()
   }
 
   esp_now_register_recv_cb(OnRecv);
+
+  Serial.println("Successfully initialized ESP Now");
 }
 
-void deinitOutdoorSensor() {
+void deinitESPNow() {
+  Serial.println("Denitializing ESP Now");
   esp_now_unregister_recv_cb();
   esp_now_del_peer(masterAddress);
   esp_now_deinit();
   WiFi.disconnect(true);
   WiFi.mode(WIFI_OFF);
+  Serial.println("Successfully deinitialized ESP Now");
 }
 
 float getOutsideTemp() {

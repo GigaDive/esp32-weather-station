@@ -1,8 +1,8 @@
 #ifndef OUTDOOR_SENSOR
 #define OUTDOOR_SENSOR
 
-void initOutdoorSensor();
-void deinitOutdoorSensor();
+void initESPNow();
+void deinitESPNow();
 
 float getOutsideTemp();
 float getOutsidePress();
