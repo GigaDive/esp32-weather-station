@@ -2,10 +2,8 @@ using namespace std;
 
 #include "services/WeekdayConverter.h"
 
-const char *intToGermanWeekday(char dayNumberChar)
+const char *intToGermanWeekday(int dayNumber)
 {
-
-    int dayNumber = dayNumberChar - '0';
     switch (dayNumber % 7)
     {
     case 0:

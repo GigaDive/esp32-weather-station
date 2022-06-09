@@ -1,6 +1,6 @@
 #ifndef WEEKDAYCONVERTER
 #define WEEKDAYCONVERTER
 
-const char *intToGermanWeekday(char dayNumberChar);
+const char *intToGermanWeekday(int dayNumber);
 
 #endif

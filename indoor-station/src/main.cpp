@@ -225,7 +225,7 @@ void drawForecastCallback(const void *)
   display.print("1"); // Sun
   display.setFont(&FiraMono_Regular10pt7b);
   display.setCursor(723, 170);
-  display.printf("%s h", getForecastTodaySunHrs());
+  display.printf("%d:%d h", getForecastTodaySunHrs(), getForecastTodaySunMin());
 
   // Overcast percentage
   display.setFont(&meteocons12pt7b);
@@ -233,16 +233,14 @@ void drawForecastCallback(const void *)
   display.print("5"); // Cloud
   display.setFont(&FiraMono_Regular10pt7b);
   display.setCursor(723, 203);
-  display.printf("%-3.0f %%", getForecastTodayOvercastPercent());
+  display.printf("%-3d %%", getForecastTodayOvercastPercent());
 
   // For the date above the forecast, we need to know what day it is today
-  char weekdayInt[2];
-  strftime(weekdayInt, 2, "%w", &timeinfo);
 
   // Tomorrow day
   display.setFont(&FiraMono_Regular10pt7b);
   display.setCursor(416, 276);
-  display.printf("%s", intToGermanWeekday(weekdayInt[0] + 1));
+  display.printf("%s", intToGermanWeekday(timeinfo.tm_wday + 1));
   // Tomorrow Icon
   display.setFont(&meteocons48pt7b);
   display.setCursor(411, 364);
@@ -258,7 +256,7 @@ void drawForecastCallback(const void *)
   // Overmorrow day
   display.setFont(&FiraMono_Regular10pt7b);
   display.setCursor(555, 276);
-  display.printf("%s", intToGermanWeekday(weekdayInt[0] + 2));
+  display.printf("%s", intToGermanWeekday(timeinfo.tm_wday + 2));
   // Overmorrow Icon
   display.setFont(&meteocons48pt7b);
   display.setCursor(553, 364);
@@ -274,7 +272,7 @@ void drawForecastCallback(const void *)
   // Overovermorrow day (the day after the day after tomorrow)
   display.setFont(&FiraMono_Regular10pt7b);
   display.setCursor(699, 276);
-  display.printf("%s", intToGermanWeekday(weekdayInt[0] + 3));
+  display.printf("%s", intToGermanWeekday(timeinfo.tm_wday + 3));
   // Overovermorrow Icon
   display.setFont(&meteocons48pt7b);
   display.setCursor(694, 364);
@@ -405,10 +403,7 @@ void drawTimeAndDate()
   strftime(displayTime.year, 5, "%Y", &timeinfo);
   strftime(displayTime.time, 6, "%R", &timeinfo);
 
-  char weekdayInt[2];
-  strftime(weekdayInt, 2, "%w", &timeinfo);
-
-  strcpy(displayTime.weekday, intToGermanWeekday(weekdayInt[0]));
+  strcpy(displayTime.weekday, intToGermanWeekday(timeinfo.tm_wday));
 
   // Lower Half of the Display
   display.setPartialWindow(24, (display.height() / 2) + 5, display.width() - 80, (display.height() / 2) - 20);
@@ -421,11 +416,12 @@ void setup()
   Serial.begin(115200);
 
   // Display
+  /*
   display.init(115200);
   display.setTextColor(GxEPD_BLACK);
   display.setRotation(0);
   drawGrid();
-
+*/
   connectWiFi();
   syncTimeWithServer();
   // Make first update to time struct
@@ -526,21 +522,3 @@ float getIndoorPress() { return 102576.80; }
 float getIndoorHumid() { return 67.55; }
 int getIndoorAQI() { return 25; }
 int getIndoorAQIAccuracy() { return 3; }
-
-char getForecastTodayIcon() { return iconTypeToMeteocon("clear-day"); }
-float getForecastTodayAvgTemp() { return 20.1; }
-float getForecastTodayMaxTemp() { return 25.8; }
-float getForecastTodayMinTemp() { return 11.8; }
-float getForecastTodayRainAmt() { return 0.0; }
-float getForecastTodayWindSpeed() { return 4.7; }
-const char *getForecastTodaySunHrs() { return "12:33"; }
-float getForecastTodayOvercastPercent() { return 56.6584; }
-
-char getForecastTomorrowIcon() { return iconTypeToMeteocon("clear-day"); }
-float getForecastTomorrowAvgTemp() { return 23.8; }
-
-char getForecastOvermorrowIcon() { return iconTypeToMeteocon("clear-day"); }
-float getForecastOvermorrowAvgTemp() { return 20.5; }
-
-char getForecastOverOvermorrowIcon() { return iconTypeToMeteocon("clear-day"); }
-float getForecastOverOvermorrowAvgTemp() { return -10.9; }

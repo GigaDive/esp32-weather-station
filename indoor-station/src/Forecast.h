@@ -9,8 +9,9 @@ float getForecastTodayMaxTemp();
 float getForecastTodayMinTemp();
 float getForecastTodayRainAmt();
 float getForecastTodayWindSpeed();
-const char* getForecastTodaySunHrs();
-float getForecastTodayOvercastPercent();
+int getForecastTodaySunHrs(); 
+int getForecastTodaySunMin(); 
+int getForecastTodayOvercastPercent();
 
 char getForecastTomorrowIcon();
 float getForecastTomorrowAvgTemp();
