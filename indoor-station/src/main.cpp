@@ -19,7 +19,7 @@ using namespace std;
 #include "fonts/FiraMonoReg24pt7b.h"
 
 #include "fonts/Meteocons48pt7b.h"
-#include "fonts/Meteocons72pt7b.h"
+#include "fonts/Meteocons70pt7b.h"
 
 #include "fonts/Meteocons20pt7b.h"
 #include "fonts/Meteocons12pt7b.h"
@@ -29,7 +29,7 @@ using namespace std;
 const int ONE_SECOND = 1000;
 
 unsigned long previousMillisOutside = 0;
-const long intervalOutside = (ONE_SECOND * 30); // DEBUG
+const long intervalOutside = (ONE_SECOND * 60) * 10;
 
 unsigned long previousMillisInside = 0;
 const long intervalInside = ONE_SECOND * 15;
@@ -97,8 +97,8 @@ void refreshCallbackWT(const void *)
 void drawGrid()
 {
   display.setFullWindow();
+  display.drawPaged(refreshCallbackBLK, 0);
   display.drawPaged(refreshCallbackWT, 0);
-  // display.drawPaged(refreshCallbackBLK, 0);
   display.setFont(&FiraMono_Bold14pt7b);
   display.drawPaged(drawGridCallback, 0);
 }
@@ -156,8 +156,8 @@ void drawForecastCallback(const void *)
 {
 
   // Print todays icon
-  display.setFont(&meteocons72pt7b);
-  display.setCursor(388, 203);
+  display.setFont(&meteocons70pt7b);
+  display.setCursor(388, 200);
   display.print(getForecastTodayIcon());
 
   // Print todays temperatures
@@ -225,7 +225,7 @@ void drawForecastCallback(const void *)
   display.print("1"); // Sun
   display.setFont(&FiraMono_Regular10pt7b);
   display.setCursor(723, 170);
-  display.printf("%d:%d h", getForecastTodaySunHrs(), getForecastTodaySunMin());
+  display.printf("%d:%02d h", getForecastTodaySunHrs(), getForecastTodaySunMin());
 
   // Overcast percentage
   display.setFont(&meteocons12pt7b);
@@ -239,7 +239,7 @@ void drawForecastCallback(const void *)
 
   // Tomorrow day
   display.setFont(&FiraMono_Regular10pt7b);
-  display.setCursor(416, 276);
+  display.setCursor(416, 274);
   display.printf("%s", intToGermanWeekday(timeinfo.tm_wday + 1));
   // Tomorrow Icon
   display.setFont(&meteocons48pt7b);
@@ -255,7 +255,7 @@ void drawForecastCallback(const void *)
 
   // Overmorrow day
   display.setFont(&FiraMono_Regular10pt7b);
-  display.setCursor(555, 276);
+  display.setCursor(555, 274);
   display.printf("%s", intToGermanWeekday(timeinfo.tm_wday + 2));
   // Overmorrow Icon
   display.setFont(&meteocons48pt7b);
@@ -271,7 +271,7 @@ void drawForecastCallback(const void *)
 
   // Overovermorrow day (the day after the day after tomorrow)
   display.setFont(&FiraMono_Regular10pt7b);
-  display.setCursor(699, 276);
+  display.setCursor(699, 274);
   display.printf("%s", intToGermanWeekday(timeinfo.tm_wday + 3));
   // Overovermorrow Icon
   display.setFont(&meteocons48pt7b);
@@ -416,12 +416,11 @@ void setup()
   Serial.begin(115200);
 
   // Display
-  /*
   display.init(115200);
   display.setTextColor(GxEPD_BLACK);
   display.setRotation(0);
   drawGrid();
-*/
+
   connectWiFi();
   syncTimeWithServer();
   // Make first update to time struct
@@ -439,8 +438,8 @@ void setup()
   initESPNow();
   Serial.println("ESP-Now Setup done \n");
 
-  // initIndoorSensor();
-  // Serial.println("Indoor-Sensor Setup done \n");
+  initIndoorSensor();
+  Serial.println("Indoor-Sensor Setup done \n");
 
   Serial.println("Making first display update");
   drawOutsideWeatherdata();
@@ -472,6 +471,7 @@ void loop()
     int seconds = timeinfo.tm_sec - 3;
     Serial.printf("Hasting the next time-update for %d seconds \n", (seconds));
     previousMillisTime -= seconds * 1000;
+    Serial.println();
   }
 
   // Update the outdoor sensor values
@@ -480,6 +480,7 @@ void loop()
     Serial.println("Updating Outside Temp");
     previousMillisOutside = currentMillis;
     drawOutsideWeatherdata();
+    Serial.println();
   }
 
   // Poll the DWD/Brightsky API as well as the NTP server and update the forecast values
@@ -501,6 +502,7 @@ void loop()
     initESPNow();
 
     drawForecast();
+    Serial.println();
   }
 
   // Update the indoor sensor values
@@ -509,16 +511,10 @@ void loop()
     Serial.println("Updating Inside Temp");
     previousMillisInside = currentMillis;
     drawInsideWeatherdata();
+    Serial.println();
   }
 
-  // loopIndoorSensor();
+  loopIndoorSensor();
 
   delay(500);
 }
-
-// DEBUGGERINO
-float getIndoorTemp() { return 22.2; }
-float getIndoorPress() { return 102576.80; }
-float getIndoorHumid() { return 67.55; }
-int getIndoorAQI() { return 25; }
-int getIndoorAQIAccuracy() { return 3; }

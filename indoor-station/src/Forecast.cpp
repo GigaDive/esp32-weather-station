@@ -4,7 +4,6 @@ using namespace std;
 #include "services/DateAdder.h"
 #include "services/IconMapper.h"
 #include "services/WindKmhToBft.h"
-#include "services/WiFiService.h"
 
 #include <Arduino.h>
 #include <stdio.h>
@@ -202,6 +201,7 @@ void syncDWDForecast()
   today.month = timeinfo.tm_mon + 1;    // timeinfo.tm_mon returns months since January
   today.day = timeinfo.tm_mday;
 
+
   //Calculate the dates for the next 3 days
   getTomorrow(today, tomorrow);
   getTomorrow(tomorrow, overmorrow);
@@ -235,13 +235,13 @@ void syncDWDForecast()
   Serial.println("Calling Brightsky-API for overmorrow");
   callBrightSkyApi(overmorrow);
   forecastData.overmorrowIcon = iconTypeToMeteocon(brightskyResponse.weather_item_icon[timeinfo.tm_hour]);
-  forecastData.tomorrowAvgTemp = dailyAvg(brightskyResponse.weather_item_temperature, 24);
+  forecastData.overmorrowAvgTemp = dailyAvg(brightskyResponse.weather_item_temperature, 24);
 
   // Get the forecast for overovermorrow
   Serial.println("Calling Brightsky-API for overovermorrow");
   callBrightSkyApi(overovermorrow);
   forecastData.overOvermorrowIcon = iconTypeToMeteocon(brightskyResponse.weather_item_icon[timeinfo.tm_hour]);
-  forecastData.tomorrowAvgTemp = dailyAvg(brightskyResponse.weather_item_temperature, 24);
+  forecastData.overOvermorrowAvgTemp = dailyAvg(brightskyResponse.weather_item_temperature, 24);
 }
 
 char getForecastTodayIcon() { return forecastData.todayIcon; }

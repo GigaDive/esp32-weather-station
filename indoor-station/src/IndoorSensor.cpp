@@ -211,10 +211,10 @@ void updateState(void)
     EEPROM.commit();
   }
 }
-/*
+
 float getIndoorTemp() { return iaqSensor.temperature; }
 float getIndoorPress() { return iaqSensor.pressure; }
 float getIndoorHumid() { return iaqSensor.humidity; }
 int getIndoorAQI() { return iaqSensor.iaq; }
 int getIndoorAQIAccuracy() { return iaqSensor.iaqAccuracy; }
-*/
+
