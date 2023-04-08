@@ -1,6 +1,7 @@
 using namespace std;
 
 #include "OutdoorSensor.h"
+#include "services/Secrets.h"
 
 #include <Arduino.h>
 
@@ -17,11 +18,11 @@ temp_humidity_pressure packet;
 
 
 // Set the SLAVE MAC Address
-uint8_t masterAddress[] = {0x7C, 0xDF, 0xA1, 0x00, 0xF9, 0xDC};
+uint8_t masterAddress[] = SENDER_MAC;
 
 // PMK and LMK keys
-static const char *PMK_KEY_STR = "PLEASE_CHANGE_ME";
-static const char *LMK_KEY_STR = "DONT_BE_LAZY_OK?";
+static const char *PMK_KEY_STR = PMK_KEY;
+static const char *LMK_KEY_STR = LMK_KEY;
 
 // this needs to be global. Thank you, Steve and Sara
 // https://rntlab.com/question/espnow-peer-interface-is-invalid/

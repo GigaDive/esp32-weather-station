@@ -4,11 +4,14 @@ using namespace std;
 #include "services/DateAdder.h"
 #include "services/IconMapper.h"
 #include "services/WindKmhToBft.h"
+#include "services/Secrets.h"
 
 #include <Arduino.h>
 #include <stdio.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
+
+const static int FOURTEEN_OCLOCK = 14;
 
 // Calling the brightsky api only works over https, so we need a certificate to check against
 const static char *root_ca PROGMEM =
@@ -57,13 +60,13 @@ struct forecast_data
   float todayOvercastPercent;
 
   char tomorrowIcon;
-  float tomorrowAvgTemp;
+  float tomorrowMaxTemp;
 
   char overmorrowIcon;
-  float overmorrowAvgTemp;
+  float overmorrowMaxTemp;
 
   char overOvermorrowIcon;
-  float overOvermorrowAvgTemp;
+  float overOvermorrowMaxTemp;
 };
 forecast_data forecastData;
 
@@ -83,7 +86,7 @@ void callBrightSkyApi(Date date)
 
   HTTPClient http;
   char request[100];
-  sprintf(request, "https://api.brightsky.dev/weather?lat=XXX&lon=XXX&date=%d-%d-%d", date.year, date.month, date.day); 
+  sprintf(request, BRIGHTSKY_URL, date.year, date.month, date.day);
   Serial.printf("Polling api at address %s...", request);
 
   // Make the request for the date
@@ -201,8 +204,7 @@ void syncDWDForecast()
   today.month = timeinfo.tm_mon + 1;    // timeinfo.tm_mon returns months since January
   today.day = timeinfo.tm_mday;
 
-
-  //Calculate the dates for the next 3 days
+  // Calculate the dates for the next 3 days
   getTomorrow(today, tomorrow);
   getTomorrow(tomorrow, overmorrow);
   getTomorrow(overmorrow, overovermorrow);
@@ -228,20 +230,20 @@ void syncDWDForecast()
   // Get the forecast for tomorrow
   Serial.println("Calling Brightsky-API for tomorrow");
   callBrightSkyApi(tomorrow);
-  forecastData.tomorrowIcon = iconTypeToMeteocon(brightskyResponse.weather_item_icon[timeinfo.tm_hour]);
-  forecastData.tomorrowAvgTemp = dailyAvg(brightskyResponse.weather_item_temperature, 24);
+  forecastData.tomorrowIcon = iconTypeToMeteocon(brightskyResponse.weather_item_icon[FOURTEEN_OCLOCK]);
+  forecastData.tomorrowMaxTemp = dailyMax(brightskyResponse.weather_item_temperature, 24);
 
   // Get the forecast for overmorrow
   Serial.println("Calling Brightsky-API for overmorrow");
   callBrightSkyApi(overmorrow);
-  forecastData.overmorrowIcon = iconTypeToMeteocon(brightskyResponse.weather_item_icon[timeinfo.tm_hour]);
-  forecastData.overmorrowAvgTemp = dailyAvg(brightskyResponse.weather_item_temperature, 24);
+  forecastData.overmorrowIcon = iconTypeToMeteocon(brightskyResponse.weather_item_icon[FOURTEEN_OCLOCK]);
+  forecastData.overmorrowMaxTemp = dailyMax(brightskyResponse.weather_item_temperature, 24);
 
   // Get the forecast for overovermorrow
   Serial.println("Calling Brightsky-API for overovermorrow");
   callBrightSkyApi(overovermorrow);
-  forecastData.overOvermorrowIcon = iconTypeToMeteocon(brightskyResponse.weather_item_icon[timeinfo.tm_hour]);
-  forecastData.overOvermorrowAvgTemp = dailyAvg(brightskyResponse.weather_item_temperature, 24);
+  forecastData.overOvermorrowIcon = iconTypeToMeteocon(brightskyResponse.weather_item_icon[FOURTEEN_OCLOCK]);
+  forecastData.overOvermorrowMaxTemp = dailyMax(brightskyResponse.weather_item_temperature, 24);
 }
 
 char getForecastTodayIcon() { return forecastData.todayIcon; }
@@ -255,10 +257,10 @@ int getForecastTodaySunMin() { return forecastData.todaySunMin; }
 int getForecastTodayOvercastPercent() { return forecastData.todayOvercastPercent; }
 
 char getForecastTomorrowIcon() { return forecastData.tomorrowIcon; }
-float getForecastTomorrowAvgTemp() { return forecastData.tomorrowAvgTemp; }
+float getForecastTomorrowTemp() { return forecastData.tomorrowMaxTemp; }
 
 char getForecastOvermorrowIcon() { return forecastData.overmorrowIcon; }
-float getForecastOvermorrowAvgTemp() { return forecastData.overmorrowAvgTemp; }
+float getForecastOvermorrowTemp() { return forecastData.overmorrowMaxTemp; }
 
 char getForecastOverOvermorrowIcon() { return forecastData.overOvermorrowIcon; }
-float getForecastOverOvermorrowAvgTemp() { return forecastData.overOvermorrowAvgTemp; }
+float getForecastOverOvermorrowTemp() { return forecastData.overOvermorrowMaxTemp; }

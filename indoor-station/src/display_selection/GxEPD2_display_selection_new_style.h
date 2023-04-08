@@ -72,7 +72,7 @@
 //#define GxEPD2_DRIVER_CLASS GxEPD2_565c // Waveshare 5.65" 7-color (3C graphics)
 // grey levels parallel IF e-papers on Waveshare e-Paper IT8951 Driver HAT
 //#define GxEPD2_DRIVER_CLASS GxEPD2_it60           // ED060SCT 800x600
-#define GxEPD2_DRIVER_CLASS GxEPD2_it60_1200x825 // ED060KC1 1448x1072
+#define GxEPD2_DRIVER_CLASS GxEPD2_it60_1200x825 // ED060KC1 1200x852
 //#define GxEPD2_DRIVER_CLASS GxEPD2_it60_1448x1072 // ED060KC1 1448x1072
 //#define GxEPD2_DRIVER_CLASS GxEPD2_it78_1872x1404 // ED078KC2 1872x1404
 

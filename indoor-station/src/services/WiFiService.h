@@ -1,7 +1,7 @@
 #ifndef WIFISERVICE
 #define WIFISERVICE
 
-void connectWiFi();
+bool connectWiFi();
 void disconnectWiFi();
 
 #endif

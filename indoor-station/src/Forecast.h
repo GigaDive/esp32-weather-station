@@ -14,13 +14,13 @@ int getForecastTodaySunMin();
 int getForecastTodayOvercastPercent();
 
 char getForecastTomorrowIcon();
-float getForecastTomorrowAvgTemp();
+float getForecastTomorrowTemp();
 
 char getForecastOvermorrowIcon();
-float getForecastOvermorrowAvgTemp();
+float getForecastOvermorrowTemp();
 
 char getForecastOverOvermorrowIcon();
-float getForecastOverOvermorrowAvgTemp();
+float getForecastOverOvermorrowTemp();
 
 
 #endif
