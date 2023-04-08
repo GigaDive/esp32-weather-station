@@ -1,5 +1,5 @@
 #ifndef INDOOR_SENSOR
-#define OUTDOOR_SENSOR
+#define INDOOR_SENSOR
 
 void initIndoorSensor();
 void loopIndoorSensor();

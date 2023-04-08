@@ -1,7 +1,7 @@
-
 #include <EEPROM.h>
 #include "IndoorSensor.h"
 #include "bsec.h"
+
 /* Configure the BSEC library with information about the sensor
     18v/33v = Voltage at Vdd. 1.8V or 3.3V
     3s/300s = BSEC operating mode, BSEC_SAMPLE_RATE_LP or BSEC_SAMPLE_RATE_ULP
@@ -41,7 +41,8 @@ void initIndoorSensor(void)
   EEPROM.begin(BSEC_MAX_STATE_BLOB_SIZE + 1); // 1st address for the length
   Wire.begin();
 
-  iaqSensor.begin(BME680_I2C_ADDR_PRIMARY, Wire);
+  pinMode(LED_BUILTIN, OUTPUT);
+  iaqSensor.begin(BME68X_I2C_ADDR_LOW, Wire);
   output = "\nBSEC library version " + String(iaqSensor.version.major) + "." + String(iaqSensor.version.minor) + "." + String(iaqSensor.version.major_bugfix) + "." + String(iaqSensor.version.minor_bugfix);
   Serial.println(output);
   checkIaqSensorStatus();
@@ -101,38 +102,38 @@ void loopIndoorSensor(void)
 // Helper function definitions
 void checkIaqSensorStatus(void)
 {
-  if (iaqSensor.status != BSEC_OK)
+  if (iaqSensor.bsecStatus != BSEC_OK)
   {
-    if (iaqSensor.status < BSEC_OK)
+    if (iaqSensor.bsecStatus < BSEC_OK)
     {
-      output = "BSEC error code : " + String(iaqSensor.status);
+      output = "BSEC error code : " + String(iaqSensor.bsecStatus);
       Serial.println(output);
       for (;;)
         errLeds(); // Halt in case of failure
     }
     else
     {
-      output = "BSEC warning code : " + String(iaqSensor.status);
+      output = "BSEC warning code : " + String(iaqSensor.bsecStatus);
       Serial.println(output);
     }
   }
 
-  if (iaqSensor.bme680Status != BME680_OK)
+  if (iaqSensor.bme68xStatus != BME68X_OK)
   {
-    if (iaqSensor.bme680Status < BME680_OK)
+    if (iaqSensor.bme68xStatus < BME68X_OK)
     {
-      output = "BME680 error code : " + String(iaqSensor.bme680Status);
+      output = "BME680 error code : " + String(iaqSensor.bme68xStatus);
       Serial.println(output);
       for (;;)
         errLeds(); // Halt in case of failure
     }
     else
     {
-      output = "BME680 warning code : " + String(iaqSensor.bme680Status);
+      output = "BME680 warning code : " + String(iaqSensor.bme68xStatus);
       Serial.println(output);
     }
   }
-  iaqSensor.status = BSEC_OK;
+  iaqSensor.bsecStatus = BSEC_OK;
 }
 
 void errLeds(void)
@@ -175,20 +176,15 @@ void loadState(void)
 void updateState(void)
 {
   bool update = false;
-  // Set a trigger to save the state. Here, the state is saved every STATE_SAVE_PERIOD with the first state being saved once the algorithm achieves full calibration, i.e. iaqAccuracy = 3
-  if (stateUpdateCounter == 0)
-  {
-    if (iaqSensor.iaqAccuracy >= 3)
-    {
+  if (stateUpdateCounter == 0) {
+    /* First state update when IAQ accuracy is >= 3 */
+    if (iaqSensor.iaqAccuracy >= 3) {
       update = true;
       stateUpdateCounter++;
     }
-  }
-  else
-  {
-    // Update every STATE_SAVE_PERIOD milliseconds
-    if ((stateUpdateCounter * STATE_SAVE_PERIOD) < millis())
-    {
+  } else {
+    /* Update every STATE_SAVE_PERIOD minutes */
+    if ((stateUpdateCounter * STATE_SAVE_PERIOD) < millis()) {
       update = true;
       stateUpdateCounter++;
     }
