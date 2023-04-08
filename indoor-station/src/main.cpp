@@ -11,6 +11,7 @@ using namespace std;
 #include "Timekeeping.h"
 
 #define ENABLE_GxEPD2_GFX 0
+#define uS_TO_S_FACTOR 1000000 // Conversion factor for micro seconds to seconds
 
 #include <GxEPD2_BW.h>
 #include "fonts/FiraMonoBold14pt7b.h"
@@ -32,13 +33,16 @@ unsigned long previousMillisOutside = 0;
 const long intervalOutside = (ONE_SECOND * 60) * 10;
 
 unsigned long previousMillisInside = 0;
-const long intervalInside = ONE_SECOND * 15;
+const long intervalInside = ONE_SECOND * 30;
 
 unsigned long previousMillisTime = 0;
 const long intervalTime = ONE_SECOND * 60;
 
 unsigned long previousMillisForecast = 0;
-const long intervalForecast = (ONE_SECOND * 60) * 60;
+const long intervalForecast = (ONE_SECOND * 60) * 30;
+
+unsigned long previousMillisDisplayReset = 0;
+const long intervalDisplayReset = (ONE_SECOND * 60) * 60 * 24;
 
 struct display_time
 {
@@ -94,18 +98,22 @@ void refreshCallbackWT(const void *)
   display.fillScreen(GxEPD_WHITE);
 }
 
-void drawGrid()
+void drawReset()
 {
   display.setFullWindow();
   display.drawPaged(refreshCallbackBLK, 0);
   display.drawPaged(refreshCallbackWT, 0);
+}
+
+void drawGrid()
+{
+  display.setFullWindow();
   display.setFont(&FiraMono_Bold14pt7b);
   display.drawPaged(drawGridCallback, 0);
 }
 
 void drawOutsideWeatherdataCallback(const void *)
 {
-
   display.setFont(&FiraMono_Bold48pt7b);
   display.setCursor(48, 191);
 
@@ -217,7 +225,7 @@ void drawForecastCallback(const void *)
   display.print("F"); // Wind
   display.setFont(&FiraMono_Regular10pt7b);
   display.setCursor(723, 135);
-  display.printf("%-2.0f bft", getForecastTodayWindSpeed());
+  display.printf("%-.0f bft", getForecastTodayWindSpeed());
 
   // Sun-hours
   display.setFont(&meteocons12pt7b);
@@ -233,7 +241,7 @@ void drawForecastCallback(const void *)
   display.print("5"); // Cloud
   display.setFont(&FiraMono_Regular10pt7b);
   display.setCursor(723, 203);
-  display.printf("%-3d %%", getForecastTodayOvercastPercent());
+  display.printf("%-d %%", getForecastTodayOvercastPercent());
 
   // For the date above the forecast, we need to know what day it is today
 
@@ -248,7 +256,7 @@ void drawForecastCallback(const void *)
   // Tomorrow Temp
   display.setFont(&FiraMono_Regular10pt7b);
   display.setCursor(429, 389);
-  display.printf("%.0f", getForecastTomorrowAvgTemp());
+  display.printf("%.0f", getForecastTomorrowTemp());
   display.setFont(&meteocons20pt7b);
   display.setCursor(455, 399);
   display.print("*");
@@ -264,7 +272,7 @@ void drawForecastCallback(const void *)
   // Overmorrow Temp
   display.setFont(&FiraMono_Regular10pt7b);
   display.setCursor(571, 389);
-  display.printf("%.0f", getForecastOvermorrowAvgTemp());
+  display.printf("%.0f", getForecastOvermorrowTemp());
   display.setFont(&meteocons20pt7b);
   display.setCursor(597, 399);
   display.print("*");
@@ -280,7 +288,7 @@ void drawForecastCallback(const void *)
   // Overovermorrow Temp
   display.setFont(&FiraMono_Regular10pt7b);
   display.setCursor(712, 389);
-  display.printf("%.0f", getForecastOvermorrowAvgTemp());
+  display.printf("%.0f", getForecastOvermorrowTemp());
   display.setFont(&meteocons20pt7b);
   display.setCursor(738, 399);
   display.print("*");
@@ -419,20 +427,33 @@ void setup()
   display.init(115200);
   display.setTextColor(GxEPD_BLACK);
   display.setRotation(0);
+  drawReset();
   drawGrid();
 
-  connectWiFi();
-  syncTimeWithServer();
-  // Make first update to time struct
-  if (!getLocalTime(&timeinfo))
+  // Try to connect the WiFi
+  if (connectWiFi())
   {
-    Serial.println("Failed to obtain time");
-    return;
-  }
-  Serial.println("NTP Setup done \n");
+    syncTimeWithServer();
+    // Make first update to time struct
+    if (!getLocalTime(&timeinfo))
+    {
+      Serial.println("Failed to obtain time");
+      return;
+    }
+    Serial.println("NTP Setup done \n");
 
-  syncDWDForecast();
-  Serial.println("DWD Setup done \n");
+    syncDWDForecast();
+    Serial.println("DWD Setup done \n");
+  }
+  else
+  {
+    // If WiFi didn't work, we turn the whole thing off and on again
+    esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_SLOW_MEM, ESP_PD_OPTION_OFF);
+    esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_FAST_MEM, ESP_PD_OPTION_OFF);
+    esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_OFF);
+    esp_sleep_enable_timer_wakeup(10 * uS_TO_S_FACTOR);
+    esp_deep_sleep_start();
+  }
   disconnectWiFi();
 
   initESPNow();
@@ -442,6 +463,7 @@ void setup()
   Serial.println("Indoor-Sensor Setup done \n");
 
   Serial.println("Making first display update");
+  loopIndoorSensor();
   drawOutsideWeatherdata();
   drawForecast();
   drawInsideWeatherdata();
@@ -450,7 +472,6 @@ void setup()
 
 void loop()
 {
-
   unsigned long currentMillis = millis();
 
   // Update the clock
@@ -471,6 +492,7 @@ void loop()
     int seconds = timeinfo.tm_sec - 3;
     Serial.printf("Hasting the next time-update for %d seconds \n", (seconds));
     previousMillisTime -= seconds * 1000;
+    display.powerOff();
     Serial.println();
   }
 
@@ -480,6 +502,7 @@ void loop()
     Serial.println("Updating Outside Temp");
     previousMillisOutside = currentMillis;
     drawOutsideWeatherdata();
+    display.powerOff();
     Serial.println();
   }
 
@@ -487,21 +510,22 @@ void loop()
   if ((currentMillis - previousMillisForecast) >= intervalForecast)
   {
     Serial.println("Updating Forecast data");
-    previousMillisOutside = currentMillis;
+    previousMillisForecast = currentMillis;
 
     // Disable ESPNow and enable WiFi
     deinitESPNow();
-    connectWiFi();
-
-    // Sync up with the DWD and NTP servers
-    syncDWDForecast();
-    syncTimeWithServer();
-
+    if (connectWiFi())
+    {
+      // If enabling the WiFi worked, sync up with the DWD and NTP servers
+      syncDWDForecast();
+      syncTimeWithServer();
+    }
     // Disable WiFi and enable ESPNow again
     disconnectWiFi();
     initESPNow();
 
     drawForecast();
+    display.powerOff();
     Serial.println();
   }
 
@@ -511,6 +535,22 @@ void loop()
     Serial.println("Updating Inside Temp");
     previousMillisInside = currentMillis;
     drawInsideWeatherdata();
+    display.powerOff();
+    Serial.println();
+  }
+
+  // Reset the screen to prevent burn-in
+  if ((currentMillis - previousMillisDisplayReset) >= intervalDisplayReset)
+  {
+    Serial.println("Resetting the screen");
+    previousMillisDisplayReset = currentMillis;
+    drawReset();
+    drawGrid();
+    drawOutsideWeatherdata();
+    drawForecast();
+    drawInsideWeatherdata();
+    drawTimeAndDate();
+    display.powerOff();
     Serial.println();
   }
 
