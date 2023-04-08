@@ -83,9 +83,9 @@ brightsky_response brightskyResponse;
 
 void callBrightSkyApi(Date date)
 {
-
   HTTPClient http;
   char request[100];
+  DynamicJsonDocument doc(16384);
   sprintf(request, BRIGHTSKY_URL, date.year, date.month, date.day);
   Serial.printf("Polling api at address %s...", request);
 
@@ -93,14 +93,14 @@ void callBrightSkyApi(Date date)
   http.useHTTP10(true); // HTTP1.1s chuncked transfer does not work when reading a byte stream
   http.setFollowRedirects(HTTPC_FORCE_FOLLOW_REDIRECTS);
   http.begin(request, root_ca);
-  http.GET();
-  Serial.println("Request successful");
+  int httpResponseCode = http.GET();
+  Serial.print("HTTP Response code: ");
+  Serial.println(httpResponseCode);
 
-  // JSON document
-  DynamicJsonDocument doc(12288);
+  // Serialise into JSON document
   DeserializationError error = deserializeJson(doc, http.getStream());
 
-  if (error != error.Ok)
+  if (error)
   {
     Serial.print("deserializeJson() failed: ");
     Serial.println(error.c_str());
@@ -120,6 +120,7 @@ void callBrightSkyApi(Date date)
     brightskyResponse.weather_item_sunshine[i] = weather_i["sunshine"];
     brightskyResponse.weather_item_cloud_cover[i] = weather_i["cloud_cover"];
   }
+  http.end();
 }
 
 float dailyTotal(float values[], u_int8_t size)
@@ -220,7 +221,7 @@ void syncDWDForecast()
   forecastData.todayAvgTemp = dailyAvg(brightskyResponse.weather_item_temperature, 24);
   forecastData.todayMaxTemp = dailyMax(brightskyResponse.weather_item_temperature, 24);
   forecastData.todayMinTemp = dailyMin(brightskyResponse.weather_item_temperature, 24);
-  forecastData.todayRainAmt = dailyMax(brightskyResponse.weather_item_temperature, 24);
+  forecastData.todayRainAmt = dailyMax(brightskyResponse.weather_item_precipitation, 24);
   forecastData.todayWindSpeed = kmhToBft(brightskyResponse.weather_item_wind_speed[timeinfo.tm_hour]);
   int totalSunshine = dailyTotal(brightskyResponse.weather_item_sunshine, 24);
   forecastData.todaySunHrs = totalSunshine / 60;
