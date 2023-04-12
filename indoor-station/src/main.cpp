@@ -30,7 +30,7 @@ using namespace std;
 const int ONE_SECOND = 1000;
 
 unsigned long previousMillisOutside = 0;
-const long intervalOutside = (ONE_SECOND * 60) * 10;
+const long intervalOutside = (ONE_SECOND * 60) * 5;
 
 unsigned long previousMillisInside = 0;
 const long intervalInside = ONE_SECOND * 30;
