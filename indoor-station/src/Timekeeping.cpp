@@ -1,14 +1,13 @@
 using namespace std;
 
-#include "time.h"
 #include "Timekeeping.h"
 
 #include <Arduino.h>
 #include <WiFi.h>
+#include "time.h"
 
-const char *ntpServer = "pool.ntp.org";
-const long gmtOffset_sec = 3600;
-const int daylightOffset_sec = 3600;
+#define NTP_SERVER "de.pool.ntp.org"           
+#define TIMEZONE "CET-1CEST,M3.5.0,M10.5.0/3"  
 
 void syncTimeWithServer()
 {
@@ -24,8 +23,11 @@ void syncTimeWithServer()
   while (!getLocalTime(&timeinfo))
   {
     Serial.print(".");
-    configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+    configTime(0, 0, NTP_SERVER);
   }
+
+  setenv("TZ",TIMEZONE, 1);
+  tzset();
   Serial.println();
   Serial.println("Successfully synced up time");
 }
