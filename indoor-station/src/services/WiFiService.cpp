@@ -6,20 +6,17 @@ using namespace std;
 #include "services/WiFiService.h"
 #include "services/Secrets.h"
 
-const char *my_ssid = SSID;
-const char *my_password = PASSWORD;
-
 int maxRetries = 5;
 
 bool connectWiFi()
 {
     Serial.print("Connecting WiFi to ");
-    Serial.println(my_ssid);
+    Serial.println(SSID);
     WiFi.disconnect(false); // Reconnect the network
     WiFi.persistent(false); // Block permanent writing to flash storage. See http://www.forum-raspberrypi.de/Thread-esp8266-achtung-flash-speicher-schreibzugriff-bei-jedem-aufruf-von-u-a-wifi-begin
     WiFi.mode(WIFI_STA);
 
-    WiFi.begin(my_ssid, my_password);
+    WiFi.begin(SSID, PASSWORD);
     int i;
     for (i = 0; WiFi.status() != WL_CONNECTED && i <= maxRetries; i++)
     {
