@@ -5,12 +5,12 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 
-Adafruit_BME280 bme; // Using the I2C-protocol, no further setup neccessary
+Adafruit_BME280 bme; // Using the I2C-protocol, no further setup necessary
 
 #define uS_TO_S_FACTOR 1000000 // Conversion factor for micro seconds to seconds
 #define TIME_TO_SLEEP 600       // Time ESP32 will go to sleep (in seconds)
 
-// Set the SLAVE MAC Address (Reciever)
+// Set the SLAVE MAC Address (Receiver)
 uint8_t slaveAddress[] = {0x34, 0xAB, 0x95, 0x48, 0x92, 0x94};
 
 // PMK and LMK keys
@@ -31,7 +31,7 @@ temp_humidity_pressure packet;
   1: DEVICE_ID not set
   30: BME280 sensor not properly connected; Check wiring
   10: There was an error initializing ESP-NOW
-  11: There was an error registering the slave/reciever
+  11: There was an error registering the slave/receiver
   20: Too many retries while trying to send data-packet via ESPNow
 */
 
@@ -51,9 +51,9 @@ int wakeModemSleep()
 void disableWiFi()
 {
   WiFi.disconnect(true); // Disconnect from the network
-  WiFi.mode(WIFI_OFF);   // Switch WiFi off
+  WiFi.mode(WIFI_OFF);   // Switch Wi-Fi off
   Serial.println("");
-  Serial.println("WiFi-Module disabeled");
+  Serial.println("WiFi-Module disabled");
 }
 
 int enableWiFi()
@@ -135,14 +135,14 @@ int readBMEValues()
 
 int sendValuesViaESPNow()
 {
-  // It's time to send the messsage via ESP-NOW ...now
+  // It's time to send the message via ESP-NOW ...now
   esp_err_t result = esp_now_send(slaveAddress, (uint8_t *)&packet, sizeof(packet));
 
   // delay(100);
 
   if (result == ESP_OK)
   {
-    Serial.println("The message was sent sucessfully.");
+    Serial.println("The message was sent successfully.");
     return 0;
   }
   else
@@ -175,7 +175,7 @@ void setup()
   // 2. Read out all sensor values from the BME280
   error = readBMEValues();
 
-  // 3. Enable wireless comunication again
+  // 3. Enable wireless communication again
   if (!error)
   {
     error = wakeModemSleep();

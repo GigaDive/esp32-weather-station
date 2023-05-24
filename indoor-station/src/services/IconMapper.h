@@ -1,6 +1,6 @@
 #ifndef ICONMAPPER
 #define ICONMAPPER
 
-const char iconTypeToMeteocon(const char* iconString);
+const char iconTypeToMeteocon(const char *iconString);
 
 #endif

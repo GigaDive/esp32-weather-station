@@ -4,15 +4,13 @@ using namespace std;
 
 static const int days[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-bool valid_date(Date today)
-{
+bool valid_date(Date today) {
     // Check month first.
     if (today.month < 1 || today.month > 12)
         return false;
 
     // Allow Feb 29 in leap year if needed.
-    if (today.month == 2 && today.day == 29)
-    {
+    if (today.month == 2 && today.day == 29) {
         if (today.year % 400 == 0)
             return true;
         if ((today.year % 4 == 0) && (today.year % 100 != 0))
@@ -26,8 +24,7 @@ bool valid_date(Date today)
     return true;
 }
 
-bool getTomorrow(Date today, Date &tomorrow)
-{
+bool getTomorrow(Date today, Date &tomorrow) {
     // Don't do anything for bad dates.
     if (!valid_date(today))
         return false;
@@ -38,8 +35,7 @@ bool getTomorrow(Date today, Date &tomorrow)
     tomorrow.day = today.day + 1;
 
     // Allow Feb 29 in leap year if needed.
-    if (tomorrow.month == 2 && tomorrow.day == 29)
-    {
+    if (tomorrow.month == 2 && tomorrow.day == 29) {
         if (tomorrow.year % 400 == 0)
             return true;
         if ((tomorrow.year % 4 == 0) && (tomorrow.year % 100 != 0))
@@ -47,14 +43,12 @@ bool getTomorrow(Date today, Date &tomorrow)
     }
 
     // Catch rolling into new month.
-    if (tomorrow.day > days[tomorrow.month - 1])
-    {
+    if (tomorrow.day > days[tomorrow.month - 1]) {
         tomorrow.day = 1;
         tomorrow.month++;
 
         // Catch rolling into new year.
-        if (tomorrow.month == 13)
-        {
+        if (tomorrow.month == 13) {
             tomorrow.month = 1;
             tomorrow.year++;
         }
